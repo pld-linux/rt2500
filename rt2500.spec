@@ -3,7 +3,7 @@
 %bcond_without	dist_kernel	# allow non-distribution kernel
 %bcond_without	kernel		# don't build kernel modules
 %bcond_without	smp		# don't build SMP module
-%bcond_without	userspace	# don't build userspace module
+%bcond_with	userspace	# don't build userspace module
 %bcond_with	verbose		# verbose build (V=1)
 #
 Summary:	Linux driver for WLAN cards based on RT2500
@@ -17,7 +17,6 @@ License:	GPL v2
 # Source0:	http://www.minitar.com/downloads/rt2500_linux-%{version}-b1.tgz
 Source0:	http://dl.sf.net/rt2400/%{name}-%{version}.tar.gz
 # Source0-md5:	2698f2634eeb7166e8a7a0397ea41fc7
-# URL:		http://www.minitar.com/
 URL:		http://rt2500.sourceforge.net/
 %if %{with kernel}
 %{?with_dist_kernel:BuildRequires:	kernel-module-build >= 2.6.7}
@@ -96,6 +95,7 @@ cd -
 # kernel module(s)
 cd Module
 for cfg in %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}; do
+	cp 2.6.x/Makefile .
 	if [ ! -r "%{_kernelsrcdir}/config-$cfg" ]; then
 		exit 1
 	fi
