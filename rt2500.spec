@@ -78,18 +78,16 @@ RT2500.
 Ten pakiet zawiera modu³ j±dra Linuksa SMP.
 
 %prep
-%setup -q -n %{name}-%{version}
+%setup -q
 
 %{__perl} -pi -e 's@/lib@/%{_lib}@g' Utilitys/Makefile
 
 %build
 %if %{with userspace}
-cd Utilitys
-%{__make} \
+%{__make} -C Utilitys \
 	CXXFLAGS="%{rpmcflags} %(pkg-config qt-mt --cflags)" \
 	LDFLAGS="%{rpmldflags}" \
 	QTDIR="%{_prefix}"
-cd -
 %endif
 
 %if %{with kernel}
