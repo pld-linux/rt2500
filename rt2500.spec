@@ -11,7 +11,7 @@ Summary(pl):	Sterownik dla Linuksa do kart bezprzewodowych opartych na uk³adzie 
 Name:		rt2500
 Version:	1.1.0
 %define		_subver	b2
-%define		_rel	0.%{_subver}.1
+%define		_rel	0.%{_subver}.2
 Release:	%{_rel}
 Group:		Base/Kernel
 License:	GPL v2
