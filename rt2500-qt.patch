@@ -1,0 +1,9 @@
+--- rt2500-1.1.0/Utilitys/raconfig2500.pro.orig	2005-02-22 11:13:40.000000000 +0100
++++ rt2500-1.1.0/Utilitys/raconfig2500.pro	2005-07-22 08:14:48.942902680 +0200
+@@ -1,5 +1,5 @@
+ TEMPLATE	=app
+-CONFIG		+= qt warn_off release
++CONFIG		+= qt thread warn_off release
+ INCLUDEPATH	+= .
+ 
+ HEADERS	+= raconfigui.h \
