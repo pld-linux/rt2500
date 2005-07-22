@@ -3,7 +3,7 @@
 %bcond_without	dist_kernel	# allow non-distribution kernel
 %bcond_without	kernel		# don't build kernel modules
 %bcond_without	smp		# don't build SMP module
-%bcond_with	userspace	# don't build userspace module
+%bcond_without	userspace	# don't build userspace module
 %bcond_with	verbose		# verbose build (V=1)
 #
 Summary:	Linux driver for WLAN cards based on RT2500
@@ -18,14 +18,16 @@ License:	GPL v2
 # Source0:	http://www.minitar.com/downloads/rt2500_linux-%{version}-b1.tgz
 Source0:	http://rt2x00.serialmonkey.com/%{name}-%{version}-%{_subver}.tar.gz
 # Source0-md5:	8846a055cd05bf71af96645637e5a2d1
+Patch0:		%{name}-qt.patch
 URL:		http://rt2x00.serialmonkey.com/
 %if %{with kernel}
 %{?with_dist_kernel:BuildRequires:	kernel-module-build >= 2.6.7}
-BuildRequires:	rpmbuild(macros) >= 1.153
+BuildRequires:	rpmbuild(macros) >= 1.217
 %endif
 %if %{with userspace}
 BuildRequires:	XFree86-devel
 BuildRequires:	pkgconfig
+BuildRequires:	qmake
 BuildRequires:	qt-devel >= 3.1.1
 %endif
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -42,9 +44,11 @@ Summary:	Linux driver for WLAN cards based on RT2500
 Summary(pl):	Sterownik dla Linuksa do kart bezprzewodowych opartych na uk³adzie RT2500
 Release:	%{_rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
-%{?with_dist_kernel:%requires_releq_kernel_up}
 Requires(post,postun):	/sbin/depmod
-%{?with_dist_kernel:Requires(postun):	kernel}
+%if %{with dist_kernel}
+%requires_releq_kernel_up
+Requires(postun):	%releq_kernel_up
+%endif
 
 %description -n kernel-net-rt2500
 This is a Linux driver for WLAN cards based on RT2500.
@@ -62,9 +66,11 @@ Summary:	Linux SMP driver for WLAN cards based on RT2500
 Summary(pl):	Sterownik dla Linuksa SMP do kart bezprzewodowych opartych na uk³adzie RT2500
 Release:	%{_rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
-%{?with_dist_kernel:%requires_releq_kernel_smp}
 Requires(post,postun):	/sbin/depmod
-%{?with_dist_kernel:Requires(postun):	kernel-smp}
+%if %{with dist_kernel}
+%requires_releq_kernel_smp
+Requires(postun):	%releq_kernel_smp
+%endif
 
 %description -n kernel-smp-net-rt2500
 This is a Linux driver for WLAN cards based on RT2500.
@@ -79,11 +85,12 @@ Ten pakiet zawiera modu³ j±dra Linuksa SMP.
 
 %prep
 %setup -q
-
-%{__perl} -pi -e 's@/lib@/%{_lib}@g' Utilitys/Makefile
+%patch0 -p1
 
 %build
 %if %{with userspace}
+qmake -unix Utilitys/raconfig2500.pro -o Utilitys/Makefile
+
 %{__make} -C Utilitys \
 	CXXFLAGS="%{rpmcflags} %(pkg-config qt-mt --cflags)" \
 	LDFLAGS="%{rpmldflags}" \
@@ -119,7 +126,7 @@ cd -
 rm -rf $RPM_BUILD_ROOT
 
 %if %{with userspace}
-install -D Utilitys/RaConfig $RPM_BUILD_ROOT%{_bindir}/RaConfig
+install -D Utilitys/RaConfig2500 $RPM_BUILD_ROOT%{_bindir}/RaConfig2500
 %endif
 
 %if %{with kernel}
@@ -153,7 +160,7 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 %doc CHANGELOG FAQ 
-%attr(755,root,root) %{_bindir}/RaConfig
+%attr(755,root,root) %{_bindir}/RaConfig2500
 %endif
 
 %if %{with kernel}
