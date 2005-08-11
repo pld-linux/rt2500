@@ -131,12 +131,12 @@ install -D Utilitys/RaConfig2500 $RPM_BUILD_ROOT%{_bindir}/RaConfig2500
 
 %if %{with kernel}
 cd Module
-install -d $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}{,smp}/drivers/net/wireless
+install -d $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}{,smp}/kernel/drivers/net/wireless
 install rt2500-%{?with_dist_kernel:up}%{!?with_dist_kernel:nondist}.ko \
-	$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/drivers/net/wireless/rt2500.ko
+	$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/kernel/drivers/net/wireless/rt2500.ko
 %if %{with smp} && %{with dist_kernel}
 install rt2500-smp.ko \
-	$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}smp/drivers/net/wireless/rt2500.ko
+	$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}smp/kernel/drivers/net/wireless/rt2500.ko
 %endif
 cd -
 %endif
@@ -166,11 +166,11 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with kernel}
 %files -n kernel-net-rt2500
 %defattr(644,root,root,755)
-/lib/modules/%{_kernel_ver}/drivers/net/wireless/*.ko*
+/lib/modules/%{_kernel_ver}/kernel/drivers/net/wireless/*.ko*
 
 %if %{with smp} && %{with dist_kernel}
 %files -n kernel-smp-net-rt2500
 %defattr(644,root,root,755)
-/lib/modules/%{_kernel_ver}smp/drivers/net/wireless/*.ko*
+/lib/modules/%{_kernel_ver}smp/kernel/drivers/net/wireless/*.ko*
 %endif
 %endif
