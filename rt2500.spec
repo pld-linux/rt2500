@@ -6,12 +6,16 @@
 %bcond_without	userspace	# don't build userspace tool
 %bcond_with	verbose		# verbose build (V=1)
 #
+%ifarch sparc
+%undefine	with_smp
+%endif
+#
 Summary:	Linux driver for WLAN cards based on RT2500
 Summary(pl):	Sterownik dla Linuksa do kart bezprzewodowych opartych na uk³adzie RT2500
 Name:		rt2500
 Version:	1.1.0
 %define		_subver	b3
-%define		_rel	0.%{_subver}.2
+%define		_rel	0.%{_subver}.3
 Release:	%{_rel}
 Group:		Base/Kernel
 License:	GPL v2
@@ -21,9 +25,6 @@ Source0:	http://rt2x00.serialmonkey.com/%{name}-%{version}-%{_subver}.tar.gz
 Patch0:		%{name}-qt.patch
 URL:		http://rt2x00.serialmonkey.com/
 %if %{with kernel}
-%ifarch sparc
-BuildRequires:  crosssparc64-gcc
-%endif
 %{?with_dist_kernel:BuildRequires:	kernel-module-build >= 2.6.7}
 BuildRequires:	rpmbuild(macros) >= 1.217
 %endif
@@ -34,11 +35,6 @@ BuildRequires:	qmake
 BuildRequires:	qt-devel >= 3.1.1
 %endif
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
-
-%ifarch sparc
-%define         _target_base_arch	sparc64
-%define         _target_base_cpu	sparc64
-%endif
 
 %description
 A configuartion tool for WLAN cards based on RT2500.
@@ -116,16 +112,12 @@ for cfg in %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}
 	install -d include/{linux,config}
 	ln -sf %{_kernelsrcdir}/config-$cfg .config
 	ln -sf %{_kernelsrcdir}/include/linux/autoconf-$cfg.h include/linux/autoconf.h
-%ifarch ppc
-	if [ -d "%{_kernelsrcdir}/include/asm-powerpc" ]; then
-		install -d include/asm
-		cp -a %{_kernelsrcdir}/include/asm-%{_target_base_arch}/* include/asm
-		cp -a %{_kernelsrcdir}/include/asm-powerpc/* include/asm
-	else
-		ln -sf %{_kernelsrcdir}/include/asm-%{_target_base_arch} include/asm
-	fi
+%ifarch ppc ppc64
+        install -d include/asm
+        [ ! -d %{_kernelsrcdir}/include/asm-powerpc ] || ln -sf %{_kernelsrcdir}/include/asm-powerpc/* include/asm
+        [ ! -d %{_kernelsrcdir}/include/asm-%{_target_base_arch} ] || ln -snf %{_kernelsrcdir}/include/asm-%{_target_base_arch}/* include/asm
 %else
-	ln -sf %{_kernelsrcdir}/include/asm-%{_target_base_arch} include/asm
+        ln -sf %{_kernelsrcdir}/include/asm-%{_target_base_arch} include/asm
 %endif
 	ln -sf %{_kernelsrcdir}/Module.symvers-$cfg Module.symvers
 	touch include/config/MARKER
