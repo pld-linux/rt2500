@@ -98,6 +98,7 @@ qmake -unix Utilitys/raconfig2500.pro -o Utilitys/Makefile
 %{__make} -C Utilitys \
 	CXXFLAGS="%{rpmcflags} %(pkg-config qt-mt --cflags)" \
 	LDFLAGS="%{rpmldflags}" \
+	CXX="%{__cxx}" \
 	QTDIR="%{_prefix}"
 %endif
 
