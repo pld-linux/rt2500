@@ -10,22 +10,22 @@
 %undefine	with_smp
 %endif
 #
+%define		_subver	b3
+%define		_rel	0.%{_subver}.3
 Summary:	Linux driver for WLAN cards based on RT2500
 Summary(pl):	Sterownik dla Linuksa do kart bezprzewodowych opartych na uk³adzie RT2500
 Name:		rt2500
 Version:	1.1.0
-%define		_subver	b3
-%define		_rel	0.%{_subver}.3
 Release:	%{_rel}
-Group:		Base/Kernel
 License:	GPL v2
+Group:		Base/Kernel
 # Source0:	http://www.minitar.com/downloads/rt2500_linux-%{version}-b1.tgz
 Source0:	http://rt2x00.serialmonkey.com/%{name}-%{version}-%{_subver}.tar.gz
 # Source0-md5:	5f05dbab713a78a03b5e1993df8f2161
 Patch0:		%{name}-qt.patch
 URL:		http://rt2x00.serialmonkey.com/
 %if %{with kernel}
-%{?with_dist_kernel:BuildRequires:	kernel-module-build >= 2.6.7}
+%{?with_dist_kernel:BuildRequires:	kernel-module-build >= 3:2.6.7}
 BuildRequires:	rpmbuild(macros) >= 1.217
 %endif
 %if %{with userspace}
@@ -114,25 +114,25 @@ for cfg in %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}
 	ln -sf %{_kernelsrcdir}/config-$cfg .config
 	ln -sf %{_kernelsrcdir}/include/linux/autoconf-$cfg.h include/linux/autoconf.h
 %ifarch ppc ppc64
-        install -d include/asm
-        [ ! -d %{_kernelsrcdir}/include/asm-powerpc ] || ln -sf %{_kernelsrcdir}/include/asm-powerpc/* include/asm
-        [ ! -d %{_kernelsrcdir}/include/asm-%{_target_base_arch} ] || ln -snf %{_kernelsrcdir}/include/asm-%{_target_base_arch}/* include/asm
+	install -d include/asm
+	[ ! -d %{_kernelsrcdir}/include/asm-powerpc ] || ln -sf %{_kernelsrcdir}/include/asm-powerpc/* include/asm
+	[ ! -d %{_kernelsrcdir}/include/asm-%{_target_base_arch} ] || ln -snf %{_kernelsrcdir}/include/asm-%{_target_base_arch}/* include/asm
 %else
-        ln -sf %{_kernelsrcdir}/include/asm-%{_target_base_arch} include/asm
+	ln -sf %{_kernelsrcdir}/include/asm-%{_target_base_arch} include/asm
 %endif
 	ln -sf %{_kernelsrcdir}/Module.symvers-$cfg Module.symvers
 	touch include/config/MARKER
-  %{__make} -C %{_kernelsrcdir} O=$PWD scripts
+	%{__make} -C %{_kernelsrcdir} O=$PWD scripts
 	%{__make} -C %{_kernelsrcdir} clean \
 		RCS_FIND_IGNORE="-name '*.ko' -o" \
 		M=$PWD O=$PWD \
 		%{?with_verbose:V=1}
 	%{__make} -C %{_kernelsrcdir} modules \
 %if "%{_target_base_arch}" != "%{_arch}"
-                ARCH=%{_target_base_arch} \
-                CROSS_COMPILE=%{_target_base_cpu}-pld-linux- \
+		ARCH=%{_target_base_arch} \
+		CROSS_COMPILE=%{_target_base_cpu}-pld-linux- \
 %endif
-                HOSTCC="%{__cc}" \
+		HOSTCC="%{__cc}" \
 		M=$PWD O=$PWD \
 		%{?with_verbose:V=1}
 	mv rt2500{,-$cfg}.ko
@@ -177,7 +177,7 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with userspace}
 %files
 %defattr(644,root,root,755)
-%doc CHANGELOG FAQ 
+%doc CHANGELOG FAQ
 %attr(755,root,root) %{_bindir}/RaConfig2500
 %endif
 
