@@ -10,8 +10,8 @@
 %undefine	with_smp
 %endif
 #
-%define		_subver	b3
-%define		_rel	0.%{_subver}.3
+%define		_subver	b4
+%define		_rel	0.%{_subver}.1
 Summary:	Linux driver for WLAN cards based on RT2500
 Summary(pl):	Sterownik dla Linuksa do kart bezprzewodowych opartych na uk³adzie RT2500
 Name:		rt2500
@@ -21,7 +21,7 @@ License:	GPL v2
 Group:		Base/Kernel
 # Source0:	http://www.minitar.com/downloads/rt2500_linux-%{version}-b1.tgz
 Source0:	http://rt2x00.serialmonkey.com/%{name}-%{version}-%{_subver}.tar.gz
-# Source0-md5:	5f05dbab713a78a03b5e1993df8f2161
+# Source0-md5:	83b8b9a091705c08d99268479f3b3b6a
 Patch0:		%{name}-qt.patch
 URL:		http://rt2x00.serialmonkey.com/
 %if %{with kernel}
@@ -29,7 +29,7 @@ URL:		http://rt2x00.serialmonkey.com/
 BuildRequires:	rpmbuild(macros) >= 1.217
 %endif
 %if %{with userspace}
-BuildRequires:	XFree86-devel
+#BuildRequires:	XFree86-devel
 BuildRequires:	pkgconfig
 BuildRequires:	qmake
 BuildRequires:	qt-devel >= 3.1.1
