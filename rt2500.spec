@@ -29,7 +29,6 @@ URL:		http://rt2x00.serialmonkey.com/
 BuildRequires:	rpmbuild(macros) >= 1.217
 %endif
 %if %{with userspace}
-#BuildRequires:	XFree86-devel
 BuildRequires:	pkgconfig
 BuildRequires:	qmake
 BuildRequires:	qt-devel >= 3.1.1
