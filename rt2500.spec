@@ -20,7 +20,7 @@ Release:	%{_rel}
 License:	GPL v2
 Group:		Base/Kernel
 # Source0:	http://www.minitar.com/downloads/rt2500_linux-%{version}-b1.tgz
-Source0:	http://rt2x00.serialmonkey.com/%{name}-%{version}-%{_subver}.tar.gz
+Source0:	http://dl.sourceforge.net/rt2400/%{name}-%{version}-%{_subver}.tar.gz
 # Source0-md5:	83b8b9a091705c08d99268479f3b3b6a
 Patch0:		%{name}-qt.patch
 URL:		http://rt2x00.serialmonkey.com/
