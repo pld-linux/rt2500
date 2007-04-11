@@ -1,0 +1,11 @@
+--- Module/rtmp_init.c	2006-06-17 22:12:58.000000000 +0200
++++ Module/rtmp_init.c-new	2007-04-11 09:24:16.698160105 +0200
+@@ -975,7 +975,7 @@
+     NICInitializeAsic(pAdapter);
+ 
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,0))
+-    INIT_WORK(&pAdapter->mlme_work, MlmeWork, (void*)pAdapter);
++    INIT_WORK(&pAdapter->mlme_work, MlmeWork);
+ #endif
+     DBGPRINT(RT_DEBUG_TRACE, "<-- NICInitializeAdapter\n");
+ }
