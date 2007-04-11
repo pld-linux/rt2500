@@ -2,14 +2,8 @@
 # Conditional build:
 %bcond_without	dist_kernel	# allow non-distribution kernel
 %bcond_without	kernel		# don't build kernel modules
-%bcond_without	smp		# don't build SMP module
-%bcond_without	up		# don't build UP module
 %bcond_without	userspace	# don't build userspace tool
 %bcond_with	verbose		# verbose build (V=1)
-#
-%ifarch sparc
-%undefine	with_smp
-%endif
 #
 %define		_subver	b4
 %define		_rel	0.%{_subver}.1
@@ -26,8 +20,8 @@ Source0:	http://dl.sourceforge.net/rt2400/%{name}-%{version}-%{_subver}.tar.gz
 Patch0:		%{name}-qt.patch
 URL:		http://rt2x00.serialmonkey.com/
 %if %{with kernel}
-%{?with_dist_kernel:BuildRequires:	kernel%{_alt_kernel}-module-build >= 3:2.6.7}
-BuildRequires:	rpmbuild(macros) >= 1.330
+%{?with_dist_kernel:BuildRequires:	kernel%{_alt_kernel}-module-build >= 3:2.6.20.2}
+BuildRequires:	rpmbuild(macros) >= 1.379
 %endif
 %if %{with userspace}
 BuildRequires:	pkgconfig
@@ -50,8 +44,8 @@ Release:	%{_rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
 Requires(post,postun):	/sbin/depmod
 %if %{with dist_kernel}
-%requires_releq_kernel_up
-Requires(postun):	%releq_kernel_up
+%requires_releq_kernel
+Requires(postun):	%releq_kernel
 %endif
 
 %description -n kernel%{_alt_kernel}-net-rt2500
@@ -64,28 +58,6 @@ Sterownik dla Linuksa do kart bezprzewodowych opartych na układzie
 RT2500.
 
 Ten pakiet zawiera moduł jądra Linuksa.
-
-%package -n kernel%{_alt_kernel}-smp-net-rt2500
-Summary:	Linux SMP driver for WLAN cards based on RT2500
-Summary(pl.UTF-8):	Sterownik dla Linuksa SMP do kart bezprzewodowych opartych na układzie RT2500
-Release:	%{_rel}@%{_kernel_ver_str}
-Group:		Base/Kernel
-Requires(post,postun):	/sbin/depmod
-%if %{with dist_kernel}
-%requires_releq_kernel_smp
-Requires(postun):	%releq_kernel_smp
-%endif
-
-%description -n kernel%{_alt_kernel}-smp-net-rt2500
-This is a Linux driver for WLAN cards based on RT2500.
-
-This package contains Linux SMP module.
-
-%description -n kernel%{_alt_kernel}-smp-net-rt2500 -l pl.UTF-8
-Sterownik dla Linuksa do kart bezprzewodowych opartych na układzie
-RT2500.
-
-Ten pakiet zawiera moduł jądra Linuksa SMP.
 
 %prep
 %setup -q -n %{name}-%{version}-%{_subver}
@@ -126,12 +98,6 @@ rm -rf $RPM_BUILD_ROOT
 %postun -n kernel%{_alt_kernel}-net-rt2500
 %depmod %{_kernel_ver}
 
-%post -n kernel%{_alt_kernel}-smp-net-rt2500
-%depmod %{_kernel_ver}smp
-
-%postun -n kernel%{_alt_kernel}-smp-net-rt2500
-%depmod %{_kernel_ver}smp
-
 %if %{with userspace}
 %files
 %defattr(644,root,root,755)
@@ -143,10 +109,4 @@ rm -rf $RPM_BUILD_ROOT
 %files -n kernel%{_alt_kernel}-net-rt2500
 %defattr(644,root,root,755)
 /lib/modules/%{_kernel_ver}/kernel/drivers/net/wireless/*.ko*
-
-%if %{with smp} && %{with dist_kernel}
-%files -n kernel%{_alt_kernel}-smp-net-rt2500
-%defattr(644,root,root,755)
-/lib/modules/%{_kernel_ver}smp/kernel/drivers/net/wireless/*.ko*
-%endif
 %endif
