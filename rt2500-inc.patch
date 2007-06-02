@@ -1,0 +1,50 @@
+diff -urN rt2500-1.1.0-b4.org/Utilitys/addprofiledlg.cpp rt2500-1.1.0-b4/Utilitys/addprofiledlg.cpp
+--- rt2500-1.1.0-b4.org/Utilitys/addprofiledlg.cpp	2006-06-17 22:12:58.000000000 +0200
++++ rt2500-1.1.0-b4/Utilitys/addprofiledlg.cpp	2007-06-02 23:19:10.859547827 +0200
+@@ -29,7 +29,7 @@
+ #include <string.h>
+ #include <sys/socket.h>
+ #include <sys/ioctl.h>
+-#include <linux/wireless.h>
++#include <wireless.h>
+ #include <ctype.h>
+ 
+ #include "rt_tool.h"
+diff -urN rt2500-1.1.0-b4.org/Utilitys/raconfig.cpp rt2500-1.1.0-b4/Utilitys/raconfig.cpp
+--- rt2500-1.1.0-b4.org/Utilitys/raconfig.cpp	2006-06-17 22:12:58.000000000 +0200
++++ rt2500-1.1.0-b4/Utilitys/raconfig.cpp	2007-06-02 23:23:38.199180097 +0200
+@@ -7,7 +7,6 @@
+ #include <sys/socket.h>
+ #include <sys/ioctl.h>
+ #include <unistd.h>
+-#include <linux/wireless.h>
+ #include <asm/errno.h>
+ #include <fcntl.h>
+ #include <sys/stat.h>  /* for mode definitions */
+diff -urN rt2500-1.1.0-b4.org/Utilitys/rt_tool.cpp rt2500-1.1.0-b4/Utilitys/rt_tool.cpp
+--- rt2500-1.1.0-b4.org/Utilitys/rt_tool.cpp	2006-06-17 22:12:58.000000000 +0200
++++ rt2500-1.1.0-b4/Utilitys/rt_tool.cpp	2007-06-02 23:23:47.806312680 +0200
+@@ -3,7 +3,6 @@
+ #include <string.h>
+ #include <sys/socket.h>
+ #include <sys/ioctl.h>
+-#include <linux/wireless.h>
+ 
+ #include "rt_tool.h"
+ #include "sha1.h"
+diff -urN rt2500-1.1.0-b4.org/Utilitys/rt_tool.h rt2500-1.1.0-b4/Utilitys/rt_tool.h
+--- rt2500-1.1.0-b4.org/Utilitys/rt_tool.h	2006-06-17 22:12:58.000000000 +0200
++++ rt2500-1.1.0-b4/Utilitys/rt_tool.h	2007-06-02 23:21:29.652945885 +0200
+@@ -2,8 +2,10 @@
+ #define RT_TOOL_H
+ 
+ #include <sys/socket.h>
+-#include <linux/types.h>
+-#include <linux/wireless.h>
++#include <sys/types.h>
++#include <net/if.h>
++#include <asm/types.h>
++#include <wireless.h>
+ 
+ #define CONFIGURATION_UI_VERSION                        "1.2.1.0"
+ #define CONFIGURATION_UI_DATE                           "2004-08-12"
