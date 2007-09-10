@@ -20,6 +20,7 @@ Source0:	http://dl.sourceforge.net/rt2400/%{name}-%{version}-%{_subver}.tar.gz
 Patch0:		%{name}-qt.patch
 Patch1:		%{name}-init_work.patch
 Patch2:		%{name}-inc.patch
+Patch3:		%{name}-skb.patch
 URL:		http://rt2x00.serialmonkey.com/
 %if %{with kernel}
 %{?with_dist_kernel:BuildRequires:	kernel%{_alt_kernel}-module-build >= 3:2.6.20.2}
@@ -67,6 +68,7 @@ Ten pakiet zawiera moduł jądra Linuksa.
 %patch0 -p1
 %patch1 -p0
 %patch2 -p1
+%patch3 -p1
 
 %build
 %if %{with userspace}

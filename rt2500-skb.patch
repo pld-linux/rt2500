@@ -1,0 +1,15 @@
+--- rt2500-1.1.0-b4/Module/rtmp_data.c~	2006-06-17 20:12:58.000000000 +0000
++++ rt2500-1.1.0-b4/Module/rtmp_data.c	2007-09-10 00:04:07.342989752 +0000
+@@ -1196,7 +1196,11 @@ VOID	RTMPHandleDecryptionDoneInterrupt(
+ 
+  	                skb->dev = pAdapter->net_dev;
+  	                memcpy(skb_put(skb, pRxD->DataByteCnt), pData, pRxD->DataByteCnt);
+- 	                skb->mac.raw = skb->data;
++#if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 22)
++			skb->mac.raw = skb->data;
++#else
++			skb->mac_header = skb->data;
++#endif 
+  	                skb->pkt_type = PACKET_OTHERHOST;
+  	                skb->protocol = htons(ETH_P_802_2);
+  	                skb->ip_summed = CHECKSUM_NONE;
