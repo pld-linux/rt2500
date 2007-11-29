@@ -6,7 +6,7 @@
 %bcond_with	verbose		# verbose build (V=1)
 #
 %define		_subver	b4
-%define		_rel	0.%{_subver}.4
+%define		_rel	0.%{_subver}.5
 Summary:	Linux driver for WLAN cards based on RT2500
 Summary(pl.UTF-8):	Sterownik dla Linuksa do kart bezprzewodowych opartych na układzie RT2500
 Name:		rt2500
