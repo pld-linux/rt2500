@@ -6,7 +6,7 @@
 %bcond_with	verbose		# verbose build (V=1)
 #
 %define		_subver	b4
-%define		_rel	0.%{_subver}.7
+%define		_rel	0.%{_subver}.8
 Summary:	Linux driver for WLAN cards based on RT2500
 Summary(pl.UTF-8):	Sterownik dla Linuksa do kart bezprzewodowych opartych na układzie RT2500
 Name:		rt2500
@@ -69,6 +69,8 @@ Ten pakiet zawiera moduł jądra Linuksa.
 %patch1 -p0
 %patch2 -p1
 %patch3 -p1
+
+sed -i -e 's#pci_module_init#pci_register_driver#g' Module/rtmp_main.c
 
 %build
 %if %{with userspace}
