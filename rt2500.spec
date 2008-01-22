@@ -4,18 +4,20 @@
 %bcond_without	kernel		# don't build kernel modules
 %bcond_without	userspace	# don't build userspace tool
 %bcond_with	verbose		# verbose build (V=1)
-#
-%define		_subver	b4
-%define		_rel	0.%{_subver}.8
+
+%define		subver	b4
+%define		prel	0.%{subver}.8
+
+%define		rel		9
 Summary:	Linux driver for WLAN cards based on RT2500
 Summary(pl.UTF-8):	Sterownik dla Linuksa do kart bezprzewodowych opartych na układzie RT2500
 Name:		rt2500
 Version:	1.1.0
-Release:	%{_rel}
+Release:	%{prel}
 License:	GPL v2
 Group:		Base/Kernel
 # Source0:	http://www.minitar.com/downloads/rt2500_linux-%{version}-b1.tgz
-Source0:	http://dl.sourceforge.net/rt2400/%{name}-%{version}-%{_subver}.tar.gz
+Source0:	http://dl.sourceforge.net/rt2400/%{name}-%{version}-%{subver}.tar.gz
 # Source0-md5:	83b8b9a091705c08d99268479f3b3b6a
 Patch0:		%{name}-qt.patch
 Patch1:		%{name}-init_work.patch
@@ -44,7 +46,7 @@ RT2500.
 %package -n kernel%{_alt_kernel}-net-rt2500
 Summary:	Linux driver for WLAN cards based on RT2500
 Summary(pl.UTF-8):	Sterownik dla Linuksa do kart bezprzewodowych opartych na układzie RT2500
-Release:	%{_rel}@%{_kernel_ver_str}
+Release:	%{prel}@%{_kernel_ver_str}
 Group:		Base/Kernel
 Requires(post,postun):	/sbin/depmod
 %if %{with dist_kernel}
@@ -64,7 +66,7 @@ RT2500.
 Ten pakiet zawiera moduł jądra Linuksa.
 
 %prep
-%setup -q -n %{name}-%{version}-%{_subver}
+%setup -q -n %{name}-%{version}-%{subver}
 %patch0 -p1
 %patch1 -p0
 %patch2 -p1
