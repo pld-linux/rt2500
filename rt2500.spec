@@ -8,7 +8,7 @@
 %define		subver	b4
 %define		prel	0.%{subver}.8
 
-%define		rel		12
+%define		rel		13
 Summary:	Linux driver for WLAN cards based on RT2500
 Summary(pl.UTF-8):	Sterownik dla Linuksa do kart bezprzewodowych opartych na układzie RT2500
 Name:		rt2500
@@ -24,6 +24,7 @@ Patch1:		%{name}-init_work.patch
 Patch2:		%{name}-inc.patch
 Patch3:		%{name}-skb.patch
 Patch4:		%{name}-2.6.24.patch
+Patch5:		%{name}-2.6.29.patch
 URL:		http://rt2x00.serialmonkey.com/
 %if %{with kernel}
 %{?with_dist_kernel:BuildRequires:	kernel%{_alt_kernel}-module-build >= 3:2.6.20.2}
@@ -73,6 +74,7 @@ Ten pakiet zawiera moduł jądra Linuksa.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
+%patch5 -p1
 
 sed -i -e 's#pci_module_init#pci_register_driver#g' Module/rtmp_main.c
 
