@@ -1,0 +1,400 @@
+Only in rt2500-1.1.0-b4/Module: .assoc.o.cmd
+Only in rt2500-1.1.0-b4/Module: .auth.o.cmd
+Only in rt2500-1.1.0-b4/Module: .auth_rsp.o.cmd
+Only in rt2500-1.1.0-b4/Module: .connect.o.cmd
+Only in rt2500-1.1.0-b4/Module: .eeprom.o.cmd
+Only in rt2500-1.1.0-b4/Module: .md5.o.cmd
+Only in rt2500-1.1.0-b4/Module: .mlme.o.cmd
+Only in rt2500-1.1.0-b4/Module: .rtmp_data.o.cmd
+Only in rt2500-1.1.0-b4/Module: .rtmp_info.o.d
+Only in rt2500-1.1.0-b4/Module: .rtmp_init.o.cmd
+Only in rt2500-1.1.0-b4/Module: .rtmp_main.o.cmd
+Only in rt2500-1.1.0-b4/Module: .rtmp_tkip.o.cmd
+Only in rt2500-1.1.0-b4/Module: .rtmp_wep.o.cmd
+Only in rt2500-1.1.0-b4/Module: .sanity.o.cmd
+Only in rt2500-1.1.0-b4/Module: .sync.o.cmd
+Only in rt2500-1.1.0-b4/Module: .tmp_versions
+Only in rt2500-1.1.0-b4/Module: .wpa.o.cmd
+Only in rt2500-1.1.0-b4/Module: assoc.o
+Only in rt2500-1.1.0-b4/Module: auth.o
+Only in rt2500-1.1.0-b4/Module: auth_rsp.o
+Only in rt2500-1.1.0-b4/Module: connect.o
+Only in rt2500-1.1.0-b4/Module: eeprom.o
+Only in rt2500-1.1.0-b4/Module: md5.o
+Only in rt2500-1.1.0-b4/Module: mlme.o
+Only in rt2500-1.1.0-b4/Module: modules.order
+Only in rt2500-1.1.0-b4/Module: o
+Only in rt2500-1.1.0-b4/Module: rtmp_data.o
+diff -upr rt2500-1.1.0-b4./Module/rtmp_info.c rt2500-1.1.0-b4/Module/rtmp_info.c
+--- rt2500-1.1.0-b4./Module/rtmp_info.c	2006-06-17 20:12:58.000000000 +0000
++++ rt2500-1.1.0-b4/Module/rtmp_info.c	2009-04-08 19:39:01.924936029 +0000
+@@ -228,7 +228,11 @@ int rt_ioctl_giwrange(struct net_device 
+ 		   struct iw_request_info *info,
+ 		   struct iw_point *data, char *extra)
+ {
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,29)
++	PRTMP_ADAPTER pAdapter = (PRTMP_ADAPTER) dev->ml_priv;
++#else
+ 	PRTMP_ADAPTER pAdapter = (PRTMP_ADAPTER) dev->priv;
++#endif
+ 	struct iw_range *range = (struct iw_range *) extra;
+ 	u16 val;
+ 	int i,chan;
+@@ -331,7 +335,11 @@ static int
+ rt_ioctl_setparam(struct net_device *dev, struct iw_request_info *info,
+ 			 void *w, char *extra)
+ {
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,29)
++	PRTMP_ADAPTER pAdapter = (PRTMP_ADAPTER) dev->ml_priv;
++#else
+ 	PRTMP_ADAPTER pAdapter = (PRTMP_ADAPTER) dev->priv;
++#endif
+ 	char *this_char;
+ 	char *value;
+ 	int  Status;
+@@ -379,7 +387,11 @@ int rt_ioctl_siwscan(struct net_device *
+ 			struct iw_point *data, char *extra)
+ {
+ 	ULONG								Now;
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,29)
++	PRTMP_ADAPTER pAdapter = (PRTMP_ADAPTER) dev->ml_priv;
++#else
+ 	PRTMP_ADAPTER pAdapter = (PRTMP_ADAPTER) dev->priv;
++#endif
+ 	int Status = NDIS_STATUS_SUCCESS;
+ 	BOOLEAN 		StateMachineTouched = FALSE;
+ 	if (RTMP_TEST_FLAG(pAdapter, fRTMP_ADAPTER_BSS_SCAN_IN_PROGRESS))
+@@ -429,8 +441,11 @@ rt_ioctl_giwscan(struct net_device *dev,
+ 			struct iw_request_info *info,
+ 			struct iw_point *data, char *extra)
+ {
+-
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,29)
++	PRTMP_ADAPTER pAdapter = (PRTMP_ADAPTER) dev->ml_priv;
++#else
+ 	PRTMP_ADAPTER pAdapter = (PRTMP_ADAPTER) dev->priv;
++#endif
+ 	int i=2, j;
+ 	char *current_ev = extra;
+ 	char *end_buf = extra + IW_SCAN_MAX_DATA;
+@@ -447,7 +462,8 @@ rt_ioctl_giwscan(struct net_device *dev,
+ 		iwe.cmd = SIOCGIWAP;
+ 		iwe.u.ap_addr.sa_family = ARPHRD_ETHER;
+ 				memcpy(iwe.u.ap_addr.sa_data, &pAdapter->PortCfg.BssTab.BssEntry[i].Bssid, ETH_ALEN);
+-			current_ev = iwe_stream_add_event(current_ev,end_buf, &iwe, IW_EV_ADDR_LEN);
++		current_ev = iwe_stream_add_event(info, current_ev,
++				end_buf, &iwe, IW_EV_ADDR_LEN);
+ 		//================================
+ 		memset(&iwe, 0, sizeof(iwe));
+ 		iwe.cmd = SIOCGIWMODE;
+@@ -465,13 +481,15 @@ rt_ioctl_giwscan(struct net_device *dev,
+ 		}
+ 
+ 		iwe.len = IW_EV_UINT_LEN;
+-		current_ev = iwe_stream_add_event(current_ev, end_buf, &iwe,  IW_EV_UINT_LEN);
++		current_ev = iwe_stream_add_event(info, current_ev,
++				end_buf, &iwe,  IW_EV_UINT_LEN);
+ 		//================================
+ 		memset(&iwe, 0, sizeof(iwe));
+ 		iwe.cmd = SIOCGIWESSID;
+ 		iwe.u.data.length = pAdapter->PortCfg.BssTab.BssEntry[i].SsidLen;
+ 		iwe.u.data.flags = 1;
+-		current_ev = iwe_stream_add_point(current_ev,end_buf, &iwe, pAdapter->PortCfg.BssTab.BssEntry[i].Ssid);
++		current_ev = iwe_stream_add_point(info, current_ev,
++				end_buf, &iwe, pAdapter->PortCfg.BssTab.BssEntry[i].Ssid);
+ 		//================================
+ 		memset(&iwe, 0, sizeof(iwe));
+ 		iwe.cmd = SIOCGIWENCODE;
+@@ -479,7 +497,8 @@ rt_ioctl_giwscan(struct net_device *dev,
+ 			iwe.u.data.flags =IW_ENCODE_ENABLED | IW_ENCODE_NOKEY;
+ 		else
+ 			iwe.u.data.flags = IW_ENCODE_DISABLED;
+-		current_ev = iwe_stream_add_point(current_ev, end_buf,&iwe,  pAdapter->PortCfg.BssTab.BssEntry[i].Ssid);
++		current_ev = iwe_stream_add_point(info, current_ev,
++				end_buf,&iwe,  pAdapter->PortCfg.BssTab.BssEntry[i].Ssid);
+ 
+ 		//================================
+ 		memset(&iwe, 0, sizeof(iwe));
+@@ -490,7 +509,7 @@ rt_ioctl_giwscan(struct net_device *dev,
+ 		{
+ 			iwe.u.bitrate.value = RateIdToMbps[pAdapter->PortCfg.BssTab.BssEntry[i].Rates[i]/2] * 1000000;
+ 			iwe.u.bitrate.disabled = 0;
+-			current_val = iwe_stream_add_value(current_ev,
++			current_val = iwe_stream_add_value(info, current_ev,
+ 				current_val, end_buf, &iwe,
+ 				IW_EV_PARAM_LEN);
+ 		}
+@@ -503,7 +522,8 @@ rt_ioctl_giwscan(struct net_device *dev,
+ 			iwe.u.freq.m = pAdapter->PortCfg.BssTab.BssEntry[i].Channel;
+ 		iwe.u.freq.e = 0;
+ 		iwe.u.freq.i = 0;
+-		current_ev = iwe_stream_add_event(current_ev,end_buf, &iwe, IW_EV_FREQ_LEN);
++		current_ev = iwe_stream_add_event(info, current_ev,
++				end_buf, &iwe, IW_EV_FREQ_LEN);
+ 		//================================
+ 		memset(&iwe, 0, sizeof(iwe));
+                 iwe.cmd = IWEVQUAL;
+@@ -515,8 +535,8 @@ rt_ioctl_giwscan(struct net_device *dev,
+ 		iwe.u.qual.noise = pAdapter->PortCfg.BssTab.BssEntry[i].Noise;
+                 //iwe.u.qual.noise = (pAdapter->PortCfg.LastR17Value > BBP_R17_DYNAMIC_UP_BOUND) ? BBP_R17_DYNAMIC_UP_BOUND : ((ULONG) pAdapter->PortCfg.LastR17Value);           // // noise level (dBm) 
+ 
+-                current_ev = iwe_stream_add_event(current_ev,end_buf, &iwe, IW_EV_QUAL_LEN);                
+-
++                current_ev = iwe_stream_add_event(info, current_ev,
++				end_buf, &iwe, IW_EV_QUAL_LEN);                
+ 
+                 //================================
+                 memset(&iwe, 0, sizeof(iwe));
+@@ -1615,7 +1635,11 @@ INT RT2500_ioctl(
+     IN  OUT struct ifreq    *rq, 
+     IN  INT                 cmd)
+ {
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,29)
++    PRTMP_ADAPTER                       pAdapter= net_dev->ml_priv;
++#else
+     PRTMP_ADAPTER                       pAdapter= net_dev->priv;
++#endif
+     struct iwreq                        *wrq = (struct iwreq *) rq;
+     struct iw_point                     *erq = NULL;
+     struct iw_freq                      *frq = NULL;
+Only in rt2500-1.1.0-b4/Module: rtmp_info.c~
+diff -upr rt2500-1.1.0-b4./Module/rtmp_init.c rt2500-1.1.0-b4/Module/rtmp_init.c
+--- rt2500-1.1.0-b4./Module/rtmp_init.c	2009-04-08 19:12:51.353072022 +0000
++++ rt2500-1.1.0-b4/Module/rtmp_init.c	2009-04-08 19:38:20.097085538 +0000
+@@ -1403,6 +1403,10 @@ VOID RTMPReadParametersFromFile(
+     int                                     i;
+     BOOLEAN                                 bIsHex = TRUE;
+ 	ULONG	rate_mapping[12] = {1, 2, 5, 11, 6, 9, 12, 18, 24, 36, 48, 54}; //according to README
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,29)
++    const struct cred *old_cred;
++    struct cred *new_cred;
++#endif
+ 
+ 	buffer = kmalloc(MAX_INI_BUFFER_SIZE, GFP_KERNEL);
+ 
+@@ -1410,9 +1414,18 @@ VOID RTMPReadParametersFromFile(
+ 
+     // Save uid and gid used for filesystem access.
+     // Set user and group to 0 (root)   
++#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,29)
+     orgfsuid = current->fsuid;
+     orgfsgid = current->fsgid;
+     current->fsuid=current->fsgid = 0;
++#else
++    new_cred=prepare_creds();
++    if (!new_cred)
++	return -ENOMEM;
++    new_cred->fsuid=0;
++    new_cred->fsgid=0;
++    old_cred=override_creds(new_cred);
++#endif
+     orgfs = get_fs();
+     set_fs(KERNEL_DS);
+ 
+@@ -1988,8 +2001,14 @@ VOID RTMPReadParametersFromFile(
+     } //if (src && *src)
+ 
+     set_fs(orgfs);
++#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,29)
+     current->fsuid = orgfsuid;
+     current->fsgid = orgfsgid;
++#else
++    revert_creds(old_cred);
++    put_cred(new_cred);
++#endif
++
+     kfree(buffer);
+ }
+ /*
+Only in rt2500-1.1.0-b4/Module: rtmp_init.o
+diff -upr rt2500-1.1.0-b4./Module/rtmp_main.c rt2500-1.1.0-b4/Module/rtmp_main.c
+--- rt2500-1.1.0-b4./Module/rtmp_main.c	2009-04-08 19:12:51.363071283 +0000
++++ rt2500-1.1.0-b4/Module/rtmp_main.c	2009-04-08 19:38:20.100424449 +0000
+@@ -92,7 +92,11 @@ static void
+ rt2x00_get_drvinfo(struct net_device *net_dev,
+ 	struct ethtool_drvinfo *drvinfo)
+ {
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,29)
++	PRTMP_ADAPTER   pAd = net_dev->ml_priv;
++#else
+ 	PRTMP_ADAPTER   pAd = net_dev->priv;
++#endif
+ 
+ 	strcpy(drvinfo->driver, NIC_DEVICE_NAME);
+ 	strcpy(drvinfo->version, DRV_VERSION);
+@@ -109,7 +113,11 @@ static void
+ rt2x00_get_regs(struct net_device *net_dev,
+ 	struct ethtool_regs *regs, void *data)
+ {
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,29)
++	PRTMP_ADAPTER   pAd = net_dev->ml_priv;
++#else
+ 	PRTMP_ADAPTER   pAd = net_dev->priv;
++#endif
+ 	unsigned int counter;
+ 
+ 	regs->len = CSR_REG_SIZE;
+@@ -130,7 +138,11 @@ static int
+ rt2x00_get_eeprom(struct net_device *net_dev,
+ 	struct ethtool_eeprom *eeprom, u8 *data)
+ {
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,29)
++	PRTMP_ADAPTER   pAd = net_dev->ml_priv;
++#else
+ 	PRTMP_ADAPTER   pAd = net_dev->priv;
++#endif
+ 	unsigned int counter;
+ 
+ 	for (counter = eeprom->offset; counter < eeprom->len; counter += sizeof(u16)) {
+@@ -225,7 +237,11 @@ INT __devinit   RT2500_probe(
+ 
+     // Save CSR virtual address and irq to device structure
+     net_dev->base_addr = (unsigned long)csr_addr;
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,29)
++    pAd = net_dev->ml_priv;
++#else
+     pAd = net_dev->priv;
++#endif
+     pAd->CSRBaseAddress = net_dev->base_addr;
+     pAd->net_dev = net_dev;
+ 
+@@ -320,7 +336,11 @@ err_out:
+ INT RT2500_open(
+     IN  struct net_device *net_dev)
+ {
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,29)
++    PRTMP_ADAPTER   pAd = net_dev->ml_priv;
++#else
+     PRTMP_ADAPTER   pAd = net_dev->priv;
++#endif
+     INT             status = NDIS_STATUS_SUCCESS;
+ 
+ #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,5,0)
+@@ -445,7 +465,11 @@ INT RTMPSendPackets(
+     IN  struct net_device *net_dev)
+ {
+     NDIS_STATUS     Status = NDIS_STATUS_SUCCESS;
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,29)
++    PRTMP_ADAPTER   pAdapter = net_dev->ml_priv;
++#else
+     PRTMP_ADAPTER   pAdapter = net_dev->priv;
++#endif
+ 
+     DBGPRINT(RT_DEBUG_INFO, "<==== RTMPSendPackets\n");
+ 
+@@ -524,7 +548,11 @@ irqreturn_t RTMPIsr(
+     IN  struct pt_regs  *rgs)
+ {
+     struct net_device   *net_dev = dev_instance;
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,29)
++    PRTMP_ADAPTER       pAdapter = net_dev->ml_priv;
++#else
+     PRTMP_ADAPTER       pAdapter = net_dev->priv;
++#endif
+     INTSRC_STRUC        IntSource;
+     int         ret = 0;
+ 
+@@ -637,7 +665,11 @@ out:
+ 
+ int rt2500_set_mac_address(struct net_device *net_dev, void *addr)
+ {
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,29)
++	RTMP_ADAPTER		*pAd = net_dev->ml_priv;
++#else
+ 	RTMP_ADAPTER		*pAd = net_dev->priv;
++#endif
+ 	struct sockaddr		*mac = (struct sockaddr*) addr;
+ 	u32			set_mac;
+ 
+@@ -695,7 +727,11 @@ int rt2500_set_mac_address(struct net_de
+ struct iw_statistics *RT2500_get_wireless_stats(
+     IN  struct net_device *net_dev)
+ {
+-    RTMP_ADAPTER *pAd = net_dev->priv;
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,29)
++	RTMP_ADAPTER		*pAd = net_dev->ml_priv;
++#else
++	RTMP_ADAPTER		*pAd = net_dev->priv;
++#endif
+ 
+     // TODO: All elements are zero before be implemented
+ 
+@@ -735,7 +771,11 @@ struct iw_statistics *RT2500_get_wireles
+ struct net_device_stats *RT2500_get_ether_stats(
+     IN  struct net_device *net_dev)
+ {
+-    RTMP_ADAPTER *pAd = net_dev->priv;
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,29)
++	RTMP_ADAPTER		*pAd = net_dev->ml_priv;
++#else
++	RTMP_ADAPTER		*pAd = net_dev->priv;
++#endif
+ 
+     DBGPRINT(RT_DEBUG_INFO, "RT2500_get_ether_stats --->\n");
+ 
+@@ -795,7 +835,11 @@ VOID RT2500_set_rx_mode(
+     IN  struct net_device *net_dev)
+ {
+     RTMP_ADAPTER *pAd;
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,29)
++    pAd = net_dev->ml_priv; 
++#else
+     pAd = net_dev->priv; 
++#endif
+     if (pAd->PortCfg.BssType == BSS_MONITOR)
+     {
+         RTMP_IO_WRITE32(pAd, RXCSR0, 0x46);
+@@ -822,7 +866,11 @@ VOID RT2500_set_rx_mode(
+ INT RT2500_close(
+     IN  struct net_device *net_dev)
+ {
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,29)
++    RTMP_ADAPTER    *pAd = net_dev->ml_priv;
++#else
+     RTMP_ADAPTER    *pAd = net_dev->priv;
++#endif
+     // LONG            ioaddr = net_dev->base_addr;
+ 
+     DBGPRINT(RT_DEBUG_TRACE, "%s: ===> RT2500_close\n", net_dev->name);
+@@ -874,7 +922,11 @@ static VOID __devexit RT2500_remove_one(
+     // RTMP_ADAPTER        *pAd = net_dev->priv;
+ 
+     // Free Ring buffers
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,29)
++    RTMPFreeDMAMemory(net_dev->ml_priv);
++#else
+     RTMPFreeDMAMemory(net_dev->priv);
++#endif
+ 
+     // Unregister network device
+     unregister_netdev(net_dev);
+@@ -914,7 +966,11 @@ static u32	suspend_buffer[16];
+ static int rt2500_suspend(struct pci_dev *pdev, pm_message_t state)
+ {
+     struct net_device *dev = pci_get_drvdata(pdev);
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,29)
++    PRTMP_ADAPTER pAdapter = (PRTMP_ADAPTER) dev->ml_priv;
++#else
+     PRTMP_ADAPTER pAdapter = (PRTMP_ADAPTER) dev->priv;
++#endif
+ 
+ 
+     if(pAdapter->PortCfg.bRadio)
+@@ -945,7 +1001,11 @@ static int rt2500_suspend(struct pci_dev
+ static int rt2500_resume(struct pci_dev *pdev)
+ {
+     struct net_device *dev = pci_get_drvdata(pdev);
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,29)
++    PRTMP_ADAPTER pAdapter = (PRTMP_ADAPTER) dev->ml_priv;
++#else
+     PRTMP_ADAPTER pAdapter = (PRTMP_ADAPTER) dev->priv;
++#endif
+     int status;
+ 
+     pci_enable_device(pdev);
+Only in rt2500-1.1.0-b4/Module: rtmp_main.o
+Only in rt2500-1.1.0-b4/Module: rtmp_tkip.o
+Only in rt2500-1.1.0-b4/Module: rtmp_wep.o
+Only in rt2500-1.1.0-b4/Module: sanity.o
+Only in rt2500-1.1.0-b4/Module: sync.o
+Only in rt2500-1.1.0-b4/Module: wpa.o
