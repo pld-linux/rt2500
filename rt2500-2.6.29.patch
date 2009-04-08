@@ -1,33 +1,6 @@
-Only in rt2500-1.1.0-b4/Module: .assoc.o.cmd
-Only in rt2500-1.1.0-b4/Module: .auth.o.cmd
-Only in rt2500-1.1.0-b4/Module: .auth_rsp.o.cmd
-Only in rt2500-1.1.0-b4/Module: .connect.o.cmd
-Only in rt2500-1.1.0-b4/Module: .eeprom.o.cmd
-Only in rt2500-1.1.0-b4/Module: .md5.o.cmd
-Only in rt2500-1.1.0-b4/Module: .mlme.o.cmd
-Only in rt2500-1.1.0-b4/Module: .rtmp_data.o.cmd
-Only in rt2500-1.1.0-b4/Module: .rtmp_info.o.d
-Only in rt2500-1.1.0-b4/Module: .rtmp_init.o.cmd
-Only in rt2500-1.1.0-b4/Module: .rtmp_main.o.cmd
-Only in rt2500-1.1.0-b4/Module: .rtmp_tkip.o.cmd
-Only in rt2500-1.1.0-b4/Module: .rtmp_wep.o.cmd
-Only in rt2500-1.1.0-b4/Module: .sanity.o.cmd
-Only in rt2500-1.1.0-b4/Module: .sync.o.cmd
-Only in rt2500-1.1.0-b4/Module: .tmp_versions
-Only in rt2500-1.1.0-b4/Module: .wpa.o.cmd
-Only in rt2500-1.1.0-b4/Module: assoc.o
-Only in rt2500-1.1.0-b4/Module: auth.o
-Only in rt2500-1.1.0-b4/Module: auth_rsp.o
-Only in rt2500-1.1.0-b4/Module: connect.o
-Only in rt2500-1.1.0-b4/Module: eeprom.o
-Only in rt2500-1.1.0-b4/Module: md5.o
-Only in rt2500-1.1.0-b4/Module: mlme.o
-Only in rt2500-1.1.0-b4/Module: modules.order
-Only in rt2500-1.1.0-b4/Module: o
-Only in rt2500-1.1.0-b4/Module: rtmp_data.o
 diff -upr rt2500-1.1.0-b4./Module/rtmp_info.c rt2500-1.1.0-b4/Module/rtmp_info.c
 --- rt2500-1.1.0-b4./Module/rtmp_info.c	2006-06-17 20:12:58.000000000 +0000
-+++ rt2500-1.1.0-b4/Module/rtmp_info.c	2009-04-08 19:39:01.924936029 +0000
++++ rt2500-1.1.0-b4/Module/rtmp_info.c	2009-04-08 20:22:02.582865681 +0000
 @@ -228,7 +228,11 @@ int rt_ioctl_giwrange(struct net_device 
  		   struct iw_request_info *info,
  		   struct iw_point *data, char *extra)
@@ -77,75 +50,113 @@ diff -upr rt2500-1.1.0-b4./Module/rtmp_info.c rt2500-1.1.0-b4/Module/rtmp_info.c
  	int i=2, j;
  	char *current_ev = extra;
  	char *end_buf = extra + IW_SCAN_MAX_DATA;
-@@ -447,7 +462,8 @@ rt_ioctl_giwscan(struct net_device *dev,
+@@ -447,7 +462,13 @@ rt_ioctl_giwscan(struct net_device *dev,
  		iwe.cmd = SIOCGIWAP;
  		iwe.u.ap_addr.sa_family = ARPHRD_ETHER;
  				memcpy(iwe.u.ap_addr.sa_data, &pAdapter->PortCfg.BssTab.BssEntry[i].Bssid, ETH_ALEN);
 -			current_ev = iwe_stream_add_event(current_ev,end_buf, &iwe, IW_EV_ADDR_LEN);
-+		current_ev = iwe_stream_add_event(info, current_ev,
-+				end_buf, &iwe, IW_EV_ADDR_LEN);
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,29)
++			current_ev = iwe_stream_add_event(info, current_ev,
++					end_buf, &iwe, IW_EV_ADDR_LEN);
++#else
++			current_ev = iwe_stream_add_event(current_ev,
++					end_buf, &iwe, IW_EV_ADDR_LEN);
++#endif
  		//================================
  		memset(&iwe, 0, sizeof(iwe));
  		iwe.cmd = SIOCGIWMODE;
-@@ -465,13 +481,15 @@ rt_ioctl_giwscan(struct net_device *dev,
+@@ -465,13 +486,25 @@ rt_ioctl_giwscan(struct net_device *dev,
  		}
  
  		iwe.len = IW_EV_UINT_LEN;
 -		current_ev = iwe_stream_add_event(current_ev, end_buf, &iwe,  IW_EV_UINT_LEN);
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,29)
 +		current_ev = iwe_stream_add_event(info, current_ev,
 +				end_buf, &iwe,  IW_EV_UINT_LEN);
++#else
++		current_ev = iwe_stream_add_event(current_ev,
++				end_buf, &iwe,  IW_EV_UINT_LEN);
++#endif
  		//================================
  		memset(&iwe, 0, sizeof(iwe));
  		iwe.cmd = SIOCGIWESSID;
  		iwe.u.data.length = pAdapter->PortCfg.BssTab.BssEntry[i].SsidLen;
  		iwe.u.data.flags = 1;
 -		current_ev = iwe_stream_add_point(current_ev,end_buf, &iwe, pAdapter->PortCfg.BssTab.BssEntry[i].Ssid);
-+		current_ev = iwe_stream_add_point(info, current_ev,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,29)
++		current_ev = iwe_stream_add_point(info, current_ev, 
 +				end_buf, &iwe, pAdapter->PortCfg.BssTab.BssEntry[i].Ssid);
++#else
++		current_ev = iwe_stream_add_point(current_ev,
++				end_buf, &iwe, pAdapter->PortCfg.BssTab.BssEntry[i].Ssid);
++#endif
  		//================================
  		memset(&iwe, 0, sizeof(iwe));
  		iwe.cmd = SIOCGIWENCODE;
-@@ -479,7 +497,8 @@ rt_ioctl_giwscan(struct net_device *dev,
+@@ -479,7 +512,13 @@ rt_ioctl_giwscan(struct net_device *dev,
  			iwe.u.data.flags =IW_ENCODE_ENABLED | IW_ENCODE_NOKEY;
  		else
  			iwe.u.data.flags = IW_ENCODE_DISABLED;
 -		current_ev = iwe_stream_add_point(current_ev, end_buf,&iwe,  pAdapter->PortCfg.BssTab.BssEntry[i].Ssid);
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,29)
 +		current_ev = iwe_stream_add_point(info, current_ev,
-+				end_buf,&iwe,  pAdapter->PortCfg.BssTab.BssEntry[i].Ssid);
++				end_buf, &iwe,  pAdapter->PortCfg.BssTab.BssEntry[i].Ssid);
++#else
++		current_ev = iwe_stream_add_point(current_ev,
++				end_buf, &iwe,  pAdapter->PortCfg.BssTab.BssEntry[i].Ssid);
++#endif
  
  		//================================
  		memset(&iwe, 0, sizeof(iwe));
-@@ -490,7 +509,7 @@ rt_ioctl_giwscan(struct net_device *dev,
+@@ -490,9 +529,13 @@ rt_ioctl_giwscan(struct net_device *dev,
  		{
  			iwe.u.bitrate.value = RateIdToMbps[pAdapter->PortCfg.BssTab.BssEntry[i].Rates[i]/2] * 1000000;
  			iwe.u.bitrate.disabled = 0;
--			current_val = iwe_stream_add_value(current_ev,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,29)
 +			current_val = iwe_stream_add_value(info, current_ev,
- 				current_val, end_buf, &iwe,
- 				IW_EV_PARAM_LEN);
++				current_val, end_buf, &iwe, IW_EV_PARAM_LEN);
++#else
+ 			current_val = iwe_stream_add_value(current_ev,
+-				current_val, end_buf, &iwe,
+-				IW_EV_PARAM_LEN);
++				current_val, end_buf, &iwe, IW_EV_PARAM_LEN);
++#endif
  		}
-@@ -503,7 +522,8 @@ rt_ioctl_giwscan(struct net_device *dev,
+ 		//================================
+ 		memset(&iwe, 0, sizeof(iwe));
+@@ -503,7 +546,13 @@ rt_ioctl_giwscan(struct net_device *dev,
  			iwe.u.freq.m = pAdapter->PortCfg.BssTab.BssEntry[i].Channel;
  		iwe.u.freq.e = 0;
  		iwe.u.freq.i = 0;
 -		current_ev = iwe_stream_add_event(current_ev,end_buf, &iwe, IW_EV_FREQ_LEN);
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,29)
 +		current_ev = iwe_stream_add_event(info, current_ev,
 +				end_buf, &iwe, IW_EV_FREQ_LEN);
++#else
++		current_ev = iwe_stream_add_event(current_ev,
++				end_buf, &iwe, IW_EV_FREQ_LEN);
++#endif
  		//================================
  		memset(&iwe, 0, sizeof(iwe));
                  iwe.cmd = IWEVQUAL;
-@@ -515,8 +535,8 @@ rt_ioctl_giwscan(struct net_device *dev,
+@@ -515,9 +564,13 @@ rt_ioctl_giwscan(struct net_device *dev,
  		iwe.u.qual.noise = pAdapter->PortCfg.BssTab.BssEntry[i].Noise;
                  //iwe.u.qual.noise = (pAdapter->PortCfg.LastR17Value > BBP_R17_DYNAMIC_UP_BOUND) ? BBP_R17_DYNAMIC_UP_BOUND : ((ULONG) pAdapter->PortCfg.LastR17Value);           // // noise level (dBm) 
  
 -                current_ev = iwe_stream_add_event(current_ev,end_buf, &iwe, IW_EV_QUAL_LEN);                
 -
+-
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,29)
 +                current_ev = iwe_stream_add_event(info, current_ev,
 +				end_buf, &iwe, IW_EV_QUAL_LEN);                
- 
++#else
++                current_ev = iwe_stream_add_event(current_ev,
++				end_buf, &iwe, IW_EV_QUAL_LEN);                
++#endif
                  //================================
                  memset(&iwe, 0, sizeof(iwe));
-@@ -1615,7 +1635,11 @@ INT RT2500_ioctl(
+ 	}
+@@ -1615,7 +1668,11 @@ INT RT2500_ioctl(
      IN  OUT struct ifreq    *rq, 
      IN  INT                 cmd)
  {
@@ -157,10 +168,9 @@ diff -upr rt2500-1.1.0-b4./Module/rtmp_info.c rt2500-1.1.0-b4/Module/rtmp_info.c
      struct iwreq                        *wrq = (struct iwreq *) rq;
      struct iw_point                     *erq = NULL;
      struct iw_freq                      *frq = NULL;
-Only in rt2500-1.1.0-b4/Module: rtmp_info.c~
 diff -upr rt2500-1.1.0-b4./Module/rtmp_init.c rt2500-1.1.0-b4/Module/rtmp_init.c
 --- rt2500-1.1.0-b4./Module/rtmp_init.c	2009-04-08 19:12:51.353072022 +0000
-+++ rt2500-1.1.0-b4/Module/rtmp_init.c	2009-04-08 19:38:20.097085538 +0000
++++ rt2500-1.1.0-b4/Module/rtmp_init.c	2009-04-08 20:22:02.582865681 +0000
 @@ -1403,6 +1403,10 @@ VOID RTMPReadParametersFromFile(
      int                                     i;
      BOOLEAN                                 bIsHex = TRUE;
@@ -206,10 +216,9 @@ diff -upr rt2500-1.1.0-b4./Module/rtmp_init.c rt2500-1.1.0-b4/Module/rtmp_init.c
      kfree(buffer);
  }
  /*
-Only in rt2500-1.1.0-b4/Module: rtmp_init.o
 diff -upr rt2500-1.1.0-b4./Module/rtmp_main.c rt2500-1.1.0-b4/Module/rtmp_main.c
 --- rt2500-1.1.0-b4./Module/rtmp_main.c	2009-04-08 19:12:51.363071283 +0000
-+++ rt2500-1.1.0-b4/Module/rtmp_main.c	2009-04-08 19:38:20.100424449 +0000
++++ rt2500-1.1.0-b4/Module/rtmp_main.c	2009-04-08 20:22:02.589537193 +0000
 @@ -92,7 +92,11 @@ static void
  rt2x00_get_drvinfo(struct net_device *net_dev,
  	struct ethtool_drvinfo *drvinfo)
@@ -392,9 +401,3 @@ diff -upr rt2500-1.1.0-b4./Module/rtmp_main.c rt2500-1.1.0-b4/Module/rtmp_main.c
      int status;
  
      pci_enable_device(pdev);
-Only in rt2500-1.1.0-b4/Module: rtmp_main.o
-Only in rt2500-1.1.0-b4/Module: rtmp_tkip.o
-Only in rt2500-1.1.0-b4/Module: rtmp_wep.o
-Only in rt2500-1.1.0-b4/Module: sanity.o
-Only in rt2500-1.1.0-b4/Module: sync.o
-Only in rt2500-1.1.0-b4/Module: wpa.o
